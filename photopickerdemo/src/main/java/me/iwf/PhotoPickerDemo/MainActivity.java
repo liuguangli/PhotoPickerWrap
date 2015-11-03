@@ -3,23 +3,25 @@ package me.iwf.PhotoPickerDemo;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.OrientationHelper;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.View;
 import java.util.ArrayList;
 import java.util.List;
+
+import commonview.AddPicLayout;
+import commonview.OnPreviewListener;
+import commonview.ShowPicLayout;
+import me.iwf.photopicker.PhotoPagerActivity;
 import me.iwf.photopicker.PhotoPickerActivity;
 import me.iwf.photopicker.utils.PhotoPickerIntent;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnPreviewListener{
 
 
-  RecyclerView recyclerView;
-  PhotoAdapter photoAdapter;
 
+  private AddPicLayout addPicLayout;
+  ShowPicLayout showPicLayout;
   ArrayList<String> selectedPhotos = new ArrayList<>();
-
+  ArrayList<String> urls = new ArrayList<>();
   public final static int REQUEST_CODE = 1;
 
 
@@ -27,57 +29,25 @@ public class MainActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
-    recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-    photoAdapter = new PhotoAdapter(this, selectedPhotos);
+    addPicLayout = (AddPicLayout) findViewById(R.id.addPicLayout);
+    addPicLayout.setOnPreviewListener(this);
+    showPicLayout = (ShowPicLayout) findViewById(R.id.showPicLayout);
+    showPicLayout.setOnPreviewListener(this);
+    urls = new ArrayList<>();
+    urls.add("http://img0.bdstatic.com/img/image/2043d07892fc42f2350bebb36c4b72ce1409212020.jpg");
+    showPicLayout.setPaths(urls);
+    findViewById(R.id.addUrl).setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
 
-    recyclerView.setLayoutManager(new StaggeredGridLayoutManager(4, OrientationHelper.VERTICAL));
-    recyclerView.setAdapter(photoAdapter);
-
-
-    findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
-      @Override public void onClick(View view) {
-        PhotoPickerIntent intent = new PhotoPickerIntent(MainActivity.this);
-        intent.setPhotoCount(9);
-        startActivityForResult(intent, REQUEST_CODE);
+        urls.add("http://img0.bdstatic.com/img/image/2043d07892fc42f2350bebb36c4b72ce1409212020.jpg");
+        showPicLayout.setPaths(urls);
       }
     });
-
-
-    findViewById(R.id.button_no_camera).setOnClickListener(new View.OnClickListener() {
-      @Override public void onClick(View v) {
-        PhotoPickerIntent intent = new PhotoPickerIntent(MainActivity.this);
-        intent.setPhotoCount(7);
-        intent.setShowCamera(false);
-        startActivityForResult(intent, REQUEST_CODE);
-      }
-    });
-
-
-    findViewById(R.id.button_one_photo).setOnClickListener(new View.OnClickListener() {
-      @Override public void onClick(View v) {
-        PhotoPickerIntent intent = new PhotoPickerIntent(MainActivity.this);
-        intent.setPhotoCount(1);
-        intent.setShowCamera(true);
-        startActivityForResult(intent, REQUEST_CODE);
-      }
-    });
-
-    findViewById(R.id.button_photo_gif).setOnClickListener(new View.OnClickListener() {
-      @Override public void onClick(View v) {
-        PhotoPickerIntent intent = new PhotoPickerIntent(MainActivity.this);
-        intent.setPhotoCount(4);
-        intent.setShowCamera(true);
-        intent.setShowGif(true);
-        startActivityForResult(intent, REQUEST_CODE);
-      }
-    });
-
   }
 
 
-  public void previewPhoto(Intent intent) {
-    startActivityForResult(intent, REQUEST_CODE);
-  }
+
 
 
   @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -91,12 +61,33 @@ public class MainActivity extends AppCompatActivity {
       selectedPhotos.clear();
 
       if (photos != null) {
-
         selectedPhotos.addAll(photos);
       }
-      photoAdapter.notifyDataSetChanged();
+      addPicLayout.setPaths(selectedPhotos);
     }
   }
 
 
+  @Override
+  public void onPreview(int pos,boolean delete) {
+
+    Intent intent = new Intent(this, PhotoPagerActivity.class);
+    intent.putExtra(PhotoPagerActivity.EXTRA_CURRENT_ITEM, pos);
+    intent.putExtra(PhotoPagerActivity.EXTRA_SHOW_DELETE,delete);
+    if (delete){
+      intent.putExtra(PhotoPagerActivity.EXTRA_PHOTOS, selectedPhotos);
+    } else {
+      intent.putExtra(PhotoPagerActivity.EXTRA_PHOTOS, urls);
+    }
+    startActivityForResult(intent, REQUEST_CODE);
+  }
+
+  @Override
+  public void onPick() {
+    PhotoPickerIntent intent = new PhotoPickerIntent(MainActivity.this);
+    intent.setPhotoCount(9);
+    intent.setShowCamera(true);
+    intent.setShowGif(false);
+    startActivityForResult(intent, REQUEST_CODE);
+  }
 }

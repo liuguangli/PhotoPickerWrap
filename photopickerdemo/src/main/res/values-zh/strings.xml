@@ -4,4 +4,6 @@
     <string name="pick_photo_without_camera">选择图片（不带拍照按钮）</string>
     <string name="pick_one_photo">选择单张图片</string>
     <string name="pick_photo_gif">选择gif图片</string>
+    <string name="add_pic_url">＋显示帖子图片（网络读取）</string>
+    <string name="add_pic_from_local">本地选择</string>
 </resources>

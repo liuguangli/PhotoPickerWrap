@@ -6,7 +6,7 @@
     </style>
 
     <style name="myTheme.actionBar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
-      <item name="android:textColorPrimary">#0000ff</item>
+      <item name="android:textColorPrimary">#ffffff</item>
     </style>
 
     <style name="myTheme" parent="Theme.AppCompat.Light.NoActionBar">
